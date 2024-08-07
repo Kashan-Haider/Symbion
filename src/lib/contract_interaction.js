@@ -54,7 +54,7 @@ export class ContractManager {
           projectWallets[i],
           ethers.formatUnits(goalAmounts[i].toString(), "ether"),
           parseInt(deadlines[i]),
-          parseInt(amountRaised[i])
+          ethers.formatUnits(amountRaised[i].toString(), "ether"),
         );
         projects.push(project);
       }
