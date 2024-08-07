@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Hero from "./components/hero/Hero";
 import Navbar from "./components/navbar/Navbar";
-import Projects from "./components/projects/Projects";
 import CreateProject from "./components/createProject/CreateProject";
+import FetchProjects from "./components/projects/Projects";
 
 export default function Home() {
   return (
@@ -10,7 +10,7 @@ export default function Home() {
       <Navbar/>
       <Hero />
       <CreateProject/>
-      <Projects />
+      <FetchProjects />
     </div>
   );
 }

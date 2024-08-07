@@ -15,6 +15,7 @@ const Navbar = () => {
   const provider = useStore((state)=> state.provider)
   const handleConnect=async()=>{
     const provider = new ethers.BrowserProvider(window.ethereum)
+    await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
     updateProvider(provider)
     updateSigner(signer)
