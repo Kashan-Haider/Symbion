@@ -6,9 +6,12 @@ import { useStore } from "@/zustand/store";
 import SmallHeading from "../ui/SmallHeading";
 import SlidingBgButton from "../ui/SlidingBgButton";
 import { ContractManager } from "@/lib/contract_interaction"; // Adjust the path as necessary
-import { ethers } from "ethers";
+import { contract_abi, contract_address } from "@/lib/abi";
+import { Contract } from "ethers";
+import { useRouter } from "next/navigation";
 
 const CreateProject = () => {
+  const router = useRouter()
   const [isSelected, setIsSelected] = useState("crowdFunding");
   const [connectedAccAddress, setConnectedAccAddress] = useState("");
   const [projectWallet, setProjectWallet] = useState(connectedAccAddress);
@@ -17,6 +20,7 @@ const CreateProject = () => {
   let provider = useStore((state) => state.provider);
   let signer = useStore((state) => state.signer);
 
+  const contract = new Contract(contract_address, contract_abi, signer)
   useEffect(() => {
     const getAddress = async () => {
       const address = await signer.getAddress();
@@ -31,14 +35,15 @@ const CreateProject = () => {
   const handleSubmit = async () => {
     if (projectWallet && goalAmount && deadline) {
       try {
-        const contractManager = await ContractManager.getInstance();
-        console.log("ContractManager:", contractManager);
-        
-        await contractManager.addProject(
+        // const contractManager = await ContractManager.getInstance();
+        // console.log("ContractManager:", contractManager);
+        const tx = await contract.addProject(
           projectWallet,
           goalAmount,
           parseInt(deadline)
         );
+        await tx.wait()
+        router.refresh()
         console.log(
           "Successful with the inputs: ",
           projectWallet,

@@ -1,8 +1,6 @@
 import { ethers } from "ethers";
 import { contract_abi, contract_address } from "./abi"; // Replace with your actual ABI import
-
 // Define the provider (MetaMask's provider)
-
 export class Project {
   constructor(projectId, projectWallet, goalAmount, deadline, amountRaised) {
     this.projectId = projectId;
@@ -43,10 +41,11 @@ export class ContractManager {
         contract_abi,
         provider
       );
-
+      const response = await read_contract.getAllProjects()
+      console.log(response)
       const [projectIds, projectWallets, goalAmounts, deadlines, amountRaised] =
         await read_contract.getAllProjects();
-
+      console.log(projectWallets)
       const projects = [];
       for (let i = 0; i < projectIds.length; i++) {
         const project = new Project(
@@ -89,6 +88,7 @@ export class ContractManager {
       console.log(`Add project transaction sent. Hash: ${tx.hash}`);
       await tx.wait();
       console.log(`Add project transaction confirmed.`);
+
     } catch (error) {
       console.error(`Error adding project:`, error);
     }
@@ -100,6 +100,7 @@ export class ContractManager {
       console.log(`Delete project transaction sent. Hash: ${tx.hash}`);
       await tx.wait();
       console.log(`Delete project transaction confirmed.`);
+
     } catch (error) {
       console.error(`Error deleting project:`, error);
     }
