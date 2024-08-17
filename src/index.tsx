@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <MerchantLogin/>
   },
   {
-    path: '/merchant',
+    path: '/merchantLogin/:merchantWallet',
     element: <Merchant/>
   }
 ])

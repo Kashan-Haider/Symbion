@@ -1,65 +1,106 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Contract, ethers } from "ethers";
-import { useStore } from "../..//zustand/store";
-import SmallHeading from "../../ui/SmallHeading";
+import React, { useEffect, useState } from "react";
+import Heading from "../../ui/Heading";
 import SlidingBgButton from "../../ui/SlidingBgButton";
-import FundraisingProjectBox from "./components/FundraisingProjectBox";
+import { BigNumberish, ethers } from "ethers";
+import {
+  crowdFunding_abi,
+  crowdFunding_address,
+  donationManager_abi,
+  donationManager_address,
+} from "../../lib/abi";
 import CrowdfundingProjectBox from "./components/CrowdfundingProjectBox";
-import { contract_abi, contract_address } from "../../lib/abi";
 
-const FetchProjects = () => {
-  const provider = useStore((state) => state.provider);
-  const signer = useStore((state) => state.signer);
-  const contract = new Contract(contract_address, contract_abi, signer);
-  const [projectsFundraising, setProjectsFundraising] = useState([]);
-  const [projectsCrowdfunding, setProjectsCrowdfunding] = useState([]);
-  const [selected, setSelected] = useState("fundraising");
-  const fetchProjects = async () => {
-    try {
-      const projectData = await contract.getAllProjects();
-      console.log("Project data:", projectData);
+const Projects = () => {
+  interface CrowdfundingProjectType {
+    projectId: number;
+    projectWallet: string;
+    goalAmount: number;
+    deadline: number;
+    amountRaised: number;
+    profitSharingRatio: number;
+    merchantDeposit: number;
+    investmentRoundIsActive: boolean;
+    profitDistributionIsDone: boolean;
+  }
+  const [selected, setSelected] = useState("crowdfunding");
+  const [fundraisingProjects, setfundraisingProjects] = useState([])
+  const [crowdFundingProjects, setcrowdFundingProjects] = useState<CrowdfundingProjectType[]>([])
 
-      // Assuming the projectData is already an array of Project instances
-      const formattedProjects = projectData[0].map((_: any, i: any) => ({
-        projectId: Number(projectData[0][i]),
-        projectWallet: projectData[1][i],
-        goalAmount: ethers.formatEther(projectData[2][i]),
-        deadline: Number(projectData[3][i]),
-        amountRaised: ethers.formatEther(projectData[4][i]),
-        fundType: projectData[5][i],
-      }));
-
-      const filteredProjectsFundraising = formattedProjects.filter(
-        (project: any) => {
-          return project.fundType == 1;
-        }
-      );
-      setProjectsFundraising(filteredProjectsFundraising);
-
-      const filteredProjectsCrowdfunding = formattedProjects.filter(
-        (project: any) => {
-          return project.fundType == 0;
-        }
-      );
-      setProjectsCrowdfunding(filteredProjectsCrowdfunding);
-
-      console.log("My Fundraising projects are", projectsFundraising);
-      console.log("My Crowdfunding projects are", projectsCrowdfunding);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
+  const [crowdFundingContract, setcrowdFundingContract] = useState<any>();
+  const [donationManagerContract, setdonationManagerContract] = useState<any>();
+  const [address, setAddress] = useState("");
   useEffect(() => {
-    if (provider) {
-      fetchProjects();
-    }
-  }, [provider]); // Ensure this effect runs only once on mount
+    const handleConnect = async () => {
+      const windowObj = window as any;
+      const provider = new ethers.BrowserProvider(windowObj.ethereum);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      const crowdFundingContract = new ethers.Contract(
+        crowdFunding_address,
+        crowdFunding_abi,
+        signer
+      );
+      const donationManagerContract = new ethers.Contract(
+        donationManager_address,
+        donationManager_abi,
+        signer
+      );
+      setcrowdFundingContract(crowdFundingContract);
+      setdonationManagerContract(donationManagerContract);
 
+      let [cfProjectIds, cfProjectWallets] = await crowdFundingContract.getAllProjects()
+      let [cfgoalAmounts, cfdeadlines, cfamountsRaised, cfprofitSharingRatios, cfmerchantDeposits, cfinvestmentRoundsActive, cfprofitDistributionsDone] = await crowdFundingContract.getAllInvestmentRoundDetails()
+
+      cfProjectIds = cfProjectIds.map((projectId:BigNumberish)=>{
+        return Number(projectId)
+      })
+      cfProjectWallets = cfProjectWallets.map((projectWallet:string)=>{
+        return projectWallet.toString()
+      })
+      cfgoalAmounts = cfgoalAmounts.map((goalamount:BigNumberish)=>{
+        return Number(goalamount)
+      })
+      cfdeadlines = cfdeadlines.map((deadline:BigNumberish)=>{
+        return Number(deadline)
+      })
+      cfamountsRaised = cfamountsRaised.map((amountraised:BigNumberish)=>{
+        return Number(amountraised)
+      })
+      cfprofitSharingRatios = cfprofitSharingRatios.map((profitsharingratio:BigNumberish)=>{
+        return Number(profitsharingratio)
+      })
+      cfmerchantDeposits = cfmerchantDeposits.map((merchantdeposit:BigNumberish)=>{
+        return Number(merchantdeposit)
+      })
+      cfinvestmentRoundsActive = cfinvestmentRoundsActive.map((investmentRoundsActive:boolean)=>{
+        return investmentRoundsActive
+      })
+      cfprofitDistributionsDone = cfprofitDistributionsDone.map((profitdistributiondone:boolean)=>{
+        return profitdistributiondone
+      })
+      const formatedCfProjects = cfProjectIds.map((_:any, i:number)=>{
+        return{
+          projectId: cfProjectIds[i],
+          ProjectWallet: cfProjectWallets[i],
+          goalAmount: cfgoalAmounts[i],
+          deadline: cfdeadlines[i],
+          amountRaised: cfamountsRaised[i],
+          profitSharingRation: cfprofitSharingRatios[i],
+          merchantDeposit: cfmerchantDeposits[i],
+          investmentRoundIsActive: cfinvestmentRoundsActive[i],
+          profitDistributionIsDone: cfprofitDistributionsDone[i],
+        }
+      })
+      setcrowdFundingProjects(formatedCfProjects)
+      setAddress(address);
+    };
+    handleConnect();
+  }, []);
   return (
-    <div id="projects" className="p-6">
-      <SmallHeading>All Projects</SmallHeading>
-      <div className="flex justify-around my-5 md:my-8">
+    <div className="p5\ md:p-10">
+      <Heading>All Projects</Heading>
+      <div className="flex justify-around items-center gap-5 flex-wrap my-8">
         <div onClick={() => setSelected("fundraising")}>
           <SlidingBgButton title="Fundraising" selected={selected} />
         </div>
@@ -67,48 +108,28 @@ const FetchProjects = () => {
           <SlidingBgButton title="CrowdFunding" selected={selected} />
         </div>
       </div>
-      {selected == "fundraising" ? (
-        <div>
-          {projectsFundraising.length > 0 ? (
-            <div>
-              <div className="flex flex-wrap items-center justify-center">
-              {projectsFundraising.map((project, index) => (
-                <FundraisingProjectBox key={index} project={project} />
-              ))}
+        {/* All Projects */}
+          {selected == 'crowdfunding' ?
+        <div className="">
+          {crowdFundingProjects.length>1? 
+          <div className="flex flex-wrap gap-5 items-center justify-center">
+            {crowdFundingProjects.map((project:CrowdfundingProjectType)=>{
+              return(
+                <CrowdfundingProjectBox props= {project}/>
+              )
+            })}
             </div>
-            <div onClick={fetchProjects} className="text-center my-5">
-            <SlidingBgButton title="Refresh Projects" />
-          </div>
-            </div>
-          ) : provider ? (
-            <p className="text-white">No projects found.</p>
-          ) : (
-            <p className="text-white">Connect Your Wallet To Fetch Projects.</p>
-          )}
+            :
+            <p>No Projects Created Yet</p>  
+        }
+        </div>  
+        :
+        <div className="flex flex-wrap gap-5 items-center justify-center">
+
         </div>
-      ) : (
-        <div>
-          {projectsCrowdfunding.length > 0 ? (
-            <div>
-              <div className="flex flex-wrap items-center justify-center">
-              {projectsCrowdfunding.map((project, index) => (
-                <CrowdfundingProjectBox key={index} project={project} />
-              ))}
-              
-            </div>
-            <div onClick={fetchProjects} className="text-center my-5">
-            <SlidingBgButton title="Refresh Projects" />
-          </div>
-            </div>
-          ) : provider ? (
-            <p className="text-white">No projects found.</p>
-          ) : (
-            <p className="text-white">Connect Your Wallet To Fetch Projects.</p>
-          )}
-        </div>
-      )}
+        }
     </div>
   );
 };
 
-export default FetchProjects;
+export default Projects;
