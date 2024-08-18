@@ -1,5 +1,5 @@
 // CrowdFunding
-export const crowdFunding_address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+export const crowdFunding_address = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 export const crowdFunding_abi = [
 	{
 		"inputs": [],
@@ -820,7 +820,7 @@ export const crowdFunding_abi = [
 ]
 
 // Donation Manager
-export const donationManager_address = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+export const donationManager_address = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
 export const donationManager_abi = [
 	{
 		"inputs": [],
@@ -1059,11 +1059,6 @@ export const donationManager_abi = [
 				"internalType": "address[]",
 				"name": "",
 				"type": "address[]"
-			},
-			{
-				"internalType": "uint256[]",
-				"name": "",
-				"type": "uint256[]"
 			},
 			{
 				"internalType": "uint256[]",

@@ -4,6 +4,7 @@ import CreateProject from './compnents/createProject/CreateProject'
 import Navbar from './compnents/navbar/Navbar'
 import Projects from './compnents/projects/Projects'
 import Banxa from './compnents/banxa/Banxa'
+import AllMerchants from './compnents/allMerchants/AllMerchants'
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
       <Banxa/>
       <CreateProject/>
       <Projects/>
+      <AllMerchants/>
     </div>
   )
 }

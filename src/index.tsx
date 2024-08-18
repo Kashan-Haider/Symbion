@@ -7,6 +7,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import FundraiserLogin from './(routes)/fundraiserLogin/FundraiserLogin';
 import MerchantLogin from './(routes)/merchantLogin/MerchantLogin';
 import Merchant from './(routes)/merchant/Merchant';
+import Fundraiser from './(routes)/fundraiser/Fundraiser';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/merchantLogin/:merchantWallet',
     element: <Merchant/>
+  },
+  {
+    path: '/fundraiser',
+    element: <Fundraiser/>
   }
 ])
 root.render(
