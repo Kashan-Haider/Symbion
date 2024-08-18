@@ -49,9 +49,8 @@ const Navbar = () => {
           } left-[50%] -translate-x-[50%] top-5 shadow-black shadow-lg capitalize text-sm font-light backdrop-blur-lg`}
         >
           <NavLink path="home" title="Home" />
-          <NavLink path="create-project" title="Create Project" />
+          <NavLink path="create" title="Create Project" />
           <NavLink path="projects" title="All Projects" />
-          <NavLink path="my-projects" title="My rojects" />
           <NavLink path="contact" title="Contact" />
 
         </div>

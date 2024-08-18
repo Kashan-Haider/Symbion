@@ -266,7 +266,7 @@ const Projects = () => {
     }
   };
   return (
-    <div className="p5\ md:p-10">
+    <div id="projects" className="p-5 md:p-10">
       <Heading>All Projects</Heading>
       <div className="flex justify-around items-center gap-5 flex-wrap my-8">
         <div onClick={() => setSelected("fundraising")}>
@@ -287,7 +287,7 @@ const Projects = () => {
                 })}
               </div>
               <div className="flex items-center justify-center">
-                <div onClick={fethFrProjects} className="w-fit">
+                <div onClick={fethFrProjects} className="w-fit mt-5">
                   <SlidingBgButton title="Refresh" />
                 </div>
               </div>
@@ -308,7 +308,7 @@ const Projects = () => {
                 )}
               </div>
               <div className="flex items-center justify-center">
-                <div onClick={fetchCfProjects} className="w-fit">
+                <div onClick={fetchCfProjects} className="w-fit mt-5">
                   <SlidingBgButton title="Refresh" />
                 </div>
               </div>

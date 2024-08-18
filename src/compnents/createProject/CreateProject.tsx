@@ -7,7 +7,7 @@ import LoginBox from "./components/LoginBox";
 
 const CreateProject = () => {
   return (
-    <div className="p-5 md:p-10">
+    <div id="create" className="p-5 md:p-10">
       <Heading>Create A Project</Heading>
       
       <div className="flex items-center justify-around gap-5" >

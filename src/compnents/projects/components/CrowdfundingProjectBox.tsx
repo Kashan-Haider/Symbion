@@ -1,4 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import SlidingBgButton from '../../../ui/SlidingBgButton';
+import { ethers } from 'ethers';
+import { crowdFunding_abi, crowdFunding_address } from '../../../lib/abi';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface CrowdfundingProject {
   projectId: number;
@@ -12,6 +16,29 @@ interface CrowdfundingProject {
   profitDistributionIsDone: boolean;
 }
 const CrowdfundingProjectBox = ({props}:{props:CrowdfundingProject}) => {
+  const [depositAmount, setdepositAmount] = useState('')
+  const [contract, setContract] = useState<any>()
+  useEffect(() => {
+    const handleConnect = async () => {
+      const windowObj = window as any;
+      const provider = new ethers.BrowserProvider(windowObj.ethereum);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      const crowdFundingContract = new ethers.Contract(
+        crowdFunding_address,
+        crowdFunding_abi,
+        signer
+      );
+      setContract(crowdFundingContract);
+    };
+    handleConnect();
+  }, []);
+  const handleDeposit = async()=>{
+    const tx = await contract.depositFunds_Crowdfunding(props.projectId, {value:depositAmount})
+    await tx.wait()
+    setdepositAmount('')
+    toast.success("Amount deposited successfully")
+  }
   return (
     < >
       {props.projectId != 0? <div className="w-full md:w-[60%] lg:w-[40%] bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
@@ -24,6 +51,17 @@ const CrowdfundingProjectBox = ({props}:{props:CrowdfundingProject}) => {
       <p>Profit Sharing Ratio: {props.profitSharingRatio ? props.profitSharingRatio : 'Not yet decided'}</p>
       <p>Investment Round Active: {props.investmentRoundIsActive == true ? 'Yes' : 'No'}</p>
       <p>Profit Distribution Done: {props.profitDistributionIsDone == true ? 'Yes' : 'No'}</p>
+      <input
+          className="w-full mb-3 bg-transparent outline-none border-b-[1px] border-white p-2 text-white placeholder:text-white"
+          type="text"
+          placeholder="Enter amount to deposit"
+          value={depositAmount}
+          onChange={(e) => setdepositAmount(e.target.value)}
+        />
+        <div onClick={handleDeposit}>
+          <Toaster/>
+          <SlidingBgButton title='Deposit'/>
+        </div>
     </div>: ''}
     </>
   )

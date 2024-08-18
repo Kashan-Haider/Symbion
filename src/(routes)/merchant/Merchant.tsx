@@ -1,10 +1,22 @@
-import { ethers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { crowdFunding_abi, crowdFunding_address } from "../../lib/abi";
 import SmallHeading from "../../ui/SmallHeading";
 import Heading from "../../ui/Heading";
 import SlidingBgButton from "../../ui/SlidingBgButton";
+import toast, { Toaster } from "react-hot-toast";
 
+interface CrowdfundingProjectType {
+  projectId: number;
+  projectWallet: string;
+  goalAmount: number;
+  deadline: number;
+  amountRaised: number;
+  profitSharingRatio: number;
+  merchantDeposit: number;
+  investmentRoundIsActive: boolean;
+  profitDistributionIsDone: boolean;
+}
 const Merchant = () => {
   const [wallet, setWallet] = useState("");
   const [projectIdForStartInvestment, setprojectIdForStartInvestment] =
@@ -22,8 +34,7 @@ const Merchant = () => {
 
   const [projectIdForEndInvestment, setprojectIdForEndInvestment] =
     useState("");
-
-
+  const [myProjects, setMyProjects] = useState<CrowdfundingProjectType[]>([])
   const [projectIdForProfitDistribution, setprojectIdForProfitDistribution] = useState('')
   const [profitAmount, setprofitAmount] = useState('')
 
@@ -40,15 +51,83 @@ const Merchant = () => {
         crowdFunding_abi,
         signer
       );
+
+
+      let [cfProjectIds, cfProjectWallets] =
+        await contract.getAllProjects();
+      let [
+        cfgoalAmounts,
+        cfdeadlines,
+        cfamountsRaised,
+        cfprofitSharingRatios,
+        cfmerchantDeposits,
+        cfinvestmentRoundsActive,
+        cfprofitDistributionsDone,
+      ] = await contract.getAllInvestmentRoundDetails();
+
+      cfProjectIds = cfProjectIds.map((projectId: BigNumberish) => {
+        return Number(projectId);
+      });
+      cfProjectWallets = cfProjectWallets.map((projectWallet: string) => {
+        return projectWallet;
+      });
+      cfgoalAmounts = cfgoalAmounts.map((goalamount: BigNumberish) => {
+        return Number(goalamount);
+      });
+      cfdeadlines = cfdeadlines.map((deadline: BigNumberish) => {
+        return Number(deadline);
+      });
+      cfamountsRaised = cfamountsRaised.map((amountraised: BigNumberish) => {
+        return Number(amountraised);
+      });
+      cfprofitSharingRatios = cfprofitSharingRatios.map(
+        (profitsharingratio: BigNumberish) => {
+          return Number(profitsharingratio);
+        }
+      );
+      cfmerchantDeposits = cfmerchantDeposits.map(
+        (merchantdeposit: BigNumberish) => {
+          return Number(merchantdeposit);
+        }
+      );
+      cfinvestmentRoundsActive = cfinvestmentRoundsActive.map(
+        (investmentRoundsActive: boolean) => {
+          return investmentRoundsActive;
+        }
+      );
+      cfprofitDistributionsDone = cfprofitDistributionsDone.map(
+        (profitdistributiondone: boolean) => {
+          return profitdistributiondone;
+        }
+      );
+      const formatedCfProjects = cfProjectIds.map((_: any, i: number) => {
+        return {
+          projectId: cfProjectIds[i],
+          projectWallet: cfProjectWallets[i],
+          goalAmount: cfgoalAmounts[i],
+          deadline: cfdeadlines[i],
+          amountRaised: cfamountsRaised[i],
+          profitSharingRation: cfprofitSharingRatios[i],
+          merchantDeposit: cfmerchantDeposits[i],
+          investmentRoundIsActive: cfinvestmentRoundsActive[i],
+          profitDistributionIsDone: cfprofitDistributionsDone[i],
+        };
+      });
+      const filteredProjects = formatedCfProjects.filter((project:CrowdfundingProjectType)=>{
+        return project.projectWallet == address
+      })
+      setMyProjects(filteredProjects)
       setContract(contract);
       setAddress(address);
 
       setWallet(address);
     };
     handleConnect();
-  }, []);
+  }, [myProjects]);
   const handleCreate = async () => {
     const tx = await contract.addProject(wallet);
+    await tx.wait()
+    toast.success("Project created")
   };
   const handleStartInvestment = async () => {
     const tx = await contract.startInvestmentRound(
@@ -65,18 +144,30 @@ const Merchant = () => {
     setyourDepositForStartInvestment("");
     setdeadlineForStartInvestment("");
     setprofitSharingRatioForStartInvestment("");
+    toast.success("Project Investment Round Started")
   };
   const handleEndInvestment = async () => {
     const tx = await contract.endInvestmentRound(projectIdForEndInvestment);
     await tx.wait();
     setprojectIdForEndInvestment("");
+    toast.success("Project Investment Round Ended")
   };
   const handleProfitDistribution= async () => {
     const tx = await contract.distributeProfits(projectIdForProfitDistribution, {value:ethers.parseEther(profitAmount)});
     await tx.wait();
     setprojectIdForProfitDistribution("");
     setprofitAmount("")
+    toast.success("Project Distribution Done")
+    
   };
+  // const handleWithdrawal = async()=>{
+  //   const tx = await contract.
+  // }
+  const handleDelete = async(id:number)=>{
+    const tx = await contract.deleteProject(id)
+    await tx.wait()
+    toast.success("Project Deleted")
+  }
   return (
     <div className="text-white p-5 md:p-10 flex flex-col gap-5 items-center justify-center bg-[#2a2a2a]">
       <Heading>Merchant</Heading>
@@ -176,6 +267,32 @@ const Merchant = () => {
           <SlidingBgButton title="Distribute Profits" />
         </div>
       </div>
+
+      {/* my projects */}
+      <div className="w-full md:w-[60%] lg:w-[40%] bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
+        <SmallHeading>My Projects</SmallHeading>
+        <div>
+          {myProjects.map((project:CrowdfundingProjectType)=>{
+            return(
+              <div className="w-full bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
+      <p>Project ID: {project.projectId}</p>
+      <p>Project Wallet: {project.projectWallet}</p>
+      <p>Goal Amount: {project.goalAmount}</p>
+      <p>Merchant Depost: {project.merchantDeposit}</p>
+      <p>Amount Raised: {project.amountRaised}</p>
+      <p>Deadline: {project.deadline}</p>
+      <p>Profit Sharing Ratio: {project.profitSharingRatio ? project.profitSharingRatio : 'Not yet decided'}</p>
+      <p>Investment Round Active: {project.investmentRoundIsActive == true ? 'Yes' : 'No'}</p>
+      <p>Profit Distribution Done: {project.profitDistributionIsDone == true ? 'Yes' : 'No'}</p>
+        <div className="mt-5" onClick={()=>handleDelete(project.projectId)}>
+          <Toaster/>
+          <SlidingBgButton title='Delete'/>
+        </div>
+    </div>
+            )
+          })}
+        </div>
+        </div>
     </div>
   );
 };
