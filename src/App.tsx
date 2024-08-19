@@ -5,6 +5,8 @@ import Navbar from './compnents/navbar/Navbar'
 import Projects from './compnents/projects/Projects'
 import Banxa from './compnents/banxa/Banxa'
 import AllMerchants from './compnents/allMerchants/AllMerchants'
+import MyInvestments from './compnents/myInvestments/MyInvestments'
+import Contact from './compnents/contact/Contact'
 
 const App = () => {
   return (
@@ -13,8 +15,10 @@ const App = () => {
       <Hero/>
       <Banxa/>
       <CreateProject/>
+      <MyInvestments/>
       <Projects/>
       <AllMerchants/>
+      <Contact/>
     </div>
   )
 }

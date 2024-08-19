@@ -17,6 +17,12 @@ interface CrowdfundingProjectType {
   investmentRoundIsActive: boolean;
   profitDistributionIsDone: boolean;
 }
+interface InvestmentType {
+  projectId: number;
+  investmentId: string;
+  amount: number;
+  refundStatuse: boolean;
+}
 const Merchant = () => {
   const [wallet, setWallet] = useState("");
   const [projectIdForStartInvestment, setprojectIdForStartInvestment] =
@@ -37,6 +43,7 @@ const Merchant = () => {
   const [myProjects, setMyProjects] = useState<CrowdfundingProjectType[]>([])
   const [projectIdForProfitDistribution, setprojectIdForProfitDistribution] = useState('')
   const [profitAmount, setprofitAmount] = useState('')
+  const [investments, setInvestments] = useState<InvestmentType[]>([]);
 
   const [contract, setContract] = useState<any>();
   const [address, setAddress] = useState("");
@@ -107,7 +114,7 @@ const Merchant = () => {
           goalAmount: cfgoalAmounts[i],
           deadline: cfdeadlines[i],
           amountRaised: cfamountsRaised[i],
-          profitSharingRation: cfprofitSharingRatios[i],
+          profitSharingRatio: cfprofitSharingRatios[i],
           merchantDeposit: cfmerchantDeposits[i],
           investmentRoundIsActive: cfinvestmentRoundsActive[i],
           profitDistributionIsDone: cfprofitDistributionsDone[i],
@@ -117,13 +124,16 @@ const Merchant = () => {
         return project.projectWallet == address
       })
       setMyProjects(filteredProjects)
-      setContract(contract);
       setAddress(address);
+
+      
+      setContract(contract);
 
       setWallet(address);
     };
     handleConnect();
-  }, [myProjects]);
+  }, []);
+
   const handleCreate = async () => {
     const tx = await contract.addProject(wallet);
     await tx.wait()
@@ -167,6 +177,34 @@ const Merchant = () => {
     const tx = await contract.deleteProject(id)
     await tx.wait()
     toast.success("Project Deleted")
+  }
+  const fetchInvestments = async(id:any)=>{
+    let [projectIds, investmentIds, amounts, refundStatuses] =
+        await contract.getInvestmentsByProjectId(id);
+        projectIds = projectIds.map((item: BigNumberish) => {
+          return Number(item);
+        });
+        investmentIds = investmentIds.map((item: any) => {
+          return item;
+        });
+        amounts = amounts.map((item: BigNumberish) => {
+          return Number(item);
+        });
+        refundStatuses = refundStatuses.map((item: boolean) => {
+          return item;
+        });
+        const formatedData: InvestmentType[] = projectIds.map(
+          (_: any, i: number) => {
+            return {
+              projectId: projectIds[i],
+              investmentId: investmentIds[i],
+              amount: amounts[i],
+              refundStatuse: refundStatuses[i],
+            };
+          }
+        );
+        console.log(formatedData);
+        setInvestments(formatedData);
   }
   return (
     <div className="text-white p-5 md:p-10 flex flex-col gap-5 items-center justify-center bg-[#2a2a2a]">
@@ -271,10 +309,12 @@ const Merchant = () => {
       {/* my projects */}
       <div className="w-full md:w-[60%] lg:w-[40%] bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
         <SmallHeading>My Projects</SmallHeading>
-        <div>
+        <div className="flex flex-col items-center justify-center gap-5
+         " >
           {myProjects.map((project:CrowdfundingProjectType)=>{
+            console.log(project);
             return(
-              <div className="w-full bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
+              <div className="w-full bg-[#00000032] rounded-xl shadow-lg shadow-black p-5 md:p-10">
       <p>Project ID: {project.projectId}</p>
       <p>Project Wallet: {project.projectWallet}</p>
       <p>Goal Amount: {project.goalAmount}</p>
@@ -286,8 +326,26 @@ const Merchant = () => {
       <p>Profit Distribution Done: {project.profitDistributionIsDone == true ? 'Yes' : 'No'}</p>
         <div className="mt-5" onClick={()=>handleDelete(project.projectId)}>
           <Toaster/>
-          <SlidingBgButton title='Delete'/>
+          <SlidingBgButton title='Delete' color="000"/>
         </div>
+        <div className="mt-5" onClick={()=> fetchInvestments(project.projectId)}>
+              <SlidingBgButton title="Get Investments Data"/>
+        </div>
+        {investments? <div>
+          {investments.map((investment:InvestmentType)=>{
+            return(
+              <div>
+                {investment.projectId == project.projectId ? <div className="my-5 bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10 text-sm">
+                <p>Investment ID: {investment.investmentId}</p>
+                <p>Project ID: {investment.projectId}</p>
+                <p>Invested Amount: {investment.amount} ETH</p>
+                <p>Refund Status: {investment.refundStatuse == true ? 'Refunded': 'Not Refunded'}</p>
+              </div> : <p className="text-center mt-2">No Investments</p>}
+
+              </div>
+            )
+          })}
+        </div> : ""}
     </div>
             )
           })}

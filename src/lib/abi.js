@@ -1,5 +1,5 @@
 // CrowdFunding
-export const crowdFunding_address = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const crowdFunding_address = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 export const crowdFunding_abi = [
 	{
 		"inputs": [],
@@ -450,6 +450,40 @@ export const crowdFunding_abi = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "projectId",
+				"type": "uint256"
+			}
+		],
+		"name": "getInvestmentsByProjectId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "bool[]",
+				"name": "",
+				"type": "bool[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "merchantWallet",
 				"type": "address"
@@ -550,6 +584,53 @@ export const crowdFunding_abi = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "investor",
+				"type": "address"
+			}
+		],
+		"name": "getProjectsInvestedByInvestor",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "bool[]",
+				"name": "",
+				"type": "bool[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "investmentCounter",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -684,6 +765,11 @@ export const crowdFunding_abi = [
 		"name": "projectInvestments",
 		"outputs": [
 			{
+				"internalType": "uint256",
+				"name": "investmentId",
+				"type": "uint256"
+			},
+			{
 				"internalType": "address",
 				"name": "investor",
 				"type": "address"
@@ -697,6 +783,11 @@ export const crowdFunding_abi = [
 				"internalType": "bool",
 				"name": "refunded",
 				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "projectId",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
