@@ -53,9 +53,9 @@ const MyInvestments = () => {
   }, []);
   return (
     <div className="p-5 md:p-10">
-      <Heading>My Investments</Heading>
+      <Heading>My CrowdFunding Investments</Heading>
       {investments.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-center" >
+        <div className="flex flex-wrap gap-5 items-center justify-center" >
           {investments.map((investment: InvestmentType) => {
             return (
                 <div className="w-full md:w-[50%] lg:w-[30%] bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
