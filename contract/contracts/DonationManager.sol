@@ -20,7 +20,6 @@ contract DonationManager {
         uint256 goalAmount;
         uint256 deadline;
         uint256 amountRaised;
-        uint256 fundType;
         bool withdrawalPermitted;
         bool withdrawalRequested;
     }
@@ -52,7 +51,7 @@ contract DonationManager {
         //admin = address(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4) ;
     }
 
-    function addProject(address projectWallet, uint256 goalAmount, uint256 deadline, uint256 fundType) public {
+    function addProject(address projectWallet, uint256 goalAmount, uint256 deadline) public {
         
         projects[projectCounter] = raiseProjects({
             projectId: projectCounter,
@@ -60,7 +59,6 @@ contract DonationManager {
             goalAmount: goalAmount,
             deadline: deadline,
             amountRaised: 0,
-            fundType: fundType,
             withdrawalPermitted: false,
             withdrawalRequested: false
         });
@@ -82,7 +80,7 @@ contract DonationManager {
         external
         view
         projectExists(projectId)
-        returns (uint256, address, uint256, uint256, uint256, uint256)
+        returns (uint256, address, uint256, uint256, uint256)
     {
         raiseProjects memory selectedProject = projects[projectId];
         return (
@@ -90,22 +88,20 @@ contract DonationManager {
             selectedProject.projectWallet,
             selectedProject.goalAmount,
             selectedProject.amountRaised,
-            selectedProject.deadline,
-            selectedProject.fundType
+            selectedProject.deadline
         );
     }
 
     function getAllProjects()
         external
         view
-        returns (uint256[] memory, address[] memory, uint256[] memory, uint256[] memory, uint256[] memory, uint256[] memory)
+        returns (uint256[] memory, address[] memory, uint256[] memory, uint256[] memory, uint256[] memory)
     {
         uint256[] memory projectIds = new uint256[](projectCounter);
         address[] memory projectWallets = new address[](projectCounter);
         uint256[] memory goalAmounts = new uint256[](projectCounter);
         uint256[] memory deadlines = new uint256[](projectCounter);
         uint256[] memory amountsRaised = new uint256[](projectCounter);
-        uint256[] memory fundTypes = new uint256[](projectCounter);
 
         for (uint256 i = 0; i < projectCounter; i++) {
             raiseProjects memory project = projects[i];
@@ -114,9 +110,8 @@ contract DonationManager {
             goalAmounts[i] = project.goalAmount;
             deadlines[i] = project.deadline;
             amountsRaised[i] = project.amountRaised;
-            fundTypes[i] = project.fundType;
         }
-        return (projectIds, projectWallets, goalAmounts, deadlines, amountsRaised, fundTypes);
+        return (projectIds, projectWallets, goalAmounts, deadlines, amountsRaised);
     }
 
     function depositFunds_Fundraising(uint256 projectId) public payable projectExists(projectId) {
@@ -124,24 +119,8 @@ contract DonationManager {
         uint256 depositedAmount = msg.value;
         require(depositedAmount > 0, "Enter an ETH value to donate");
         raiseProjects storage project = projects[projectId];
-        require(project.fundType == 1, "Invalid funding project");
         project.amountRaised += depositedAmount;
         emit TokensFunded_Fundraising(msg.sender, projectId, depositedAmount);
-    }
-
-    function depositFunds_Crowdfunding(uint256 projectId) public payable projectExists(projectId) {
-        
-        // Crowdfunding platform fee: % deducted from funding amount.
-        uint256 depositedAmount = msg.value;
-        require(depositedAmount > 0, "Enter an ETH value to donate");
-
-        raiseProjects storage project = projects[projectId];
-        require(project.fundType == 0, "Invalid funding project");
-
-        uint256 FEE = (depositedAmount *10)/100;
-        depositedAmount = depositedAmount - FEE;
-        project.amountRaised += depositedAmount;
-        emit TokensFunded_Crowdfunding(msg.sender, projectId, depositedAmount);
     }
 
     // Once the project owner logs in, the admin permits withdrawals to occur during the session, setting firstApproval to true.

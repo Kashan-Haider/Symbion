@@ -54,16 +54,18 @@ const MyInvestments = () => {
   return (
     <div className="p-5 md:p-10">
       <Heading>My CrowdFunding Investments</Heading>
-      {investments.length > 0 ? (
+      {investments.length > 1 ? (
         <div className="flex flex-wrap gap-5 items-center justify-center" >
           {investments.map((investment: InvestmentType) => {
             return (
-                <div className="w-full md:w-[50%] lg:w-[30%] bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
+               <div>
+                {investment.investmentId != 0 ?  <div className="w-full bg-[#fff2] rounded-xl shadow-lg shadow-black p-5 md:p-10">
                 <p>Investment ID: {investment.investmentId}</p>
                 <p>Project ID: {investment.projectId}</p>
                 <p>Invested Amount: {investment.amount} ETH</p>
                 <p>Refund Status: {investment.refundStatuse == true ? 'Refunded': 'Not Refunded'}</p>
-              </div>
+              </div>: ''}
+               </div>
             );
           })}
         </div>

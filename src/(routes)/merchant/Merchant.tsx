@@ -329,13 +329,12 @@ const Merchant = () => {
          "
         >
           {myProjects.map((project: CrowdfundingProjectType) => {
-            console.log(project);
             return (
               <div className="w-full bg-[#00000032] rounded-xl shadow-lg shadow-black p-5 md:p-10">
                 <p>Project ID: {project.projectId}</p>
                 <p>Project Wallet: {project.projectWallet}</p>
                 <p>Goal Amount: {project.goalAmount}</p>
-                <p>Merchant Depost: {project.merchantDeposit}</p>
+                <p>Merchant Depost: {project.merchantDeposit/1000000000000000000}</p>
                 <p>Amount Raised: {project.amountRaised}</p>
                 <p>Deadline: {project.deadline}</p>
                 <p>
@@ -360,7 +359,7 @@ const Merchant = () => {
                   <SlidingBgButton title="Delete" color="000" />
                 </div>
                 <div>
-                  {formatedData.length > 0 ? (
+                  {formatedData.length > 1 ? (
                     <div>
                       {formatedData.map((investment: InvestmentType) => {
                         return (
@@ -385,10 +384,10 @@ const Merchant = () => {
                       })}
                     </div>
                   ) : (
-                    <p>No Investments</p>
+                    <p className="text-center mt-3">Click Below To Fetch Investments</p>
                   )}
                 </div>
-                <div onClick={fetchMyInvestments} className="mt-5">
+                <div onClick={fetchMyInvestments} className="mt-3">
                   <SlidingBgButton title="Fetch Investments" />
                 </div>
               </div>

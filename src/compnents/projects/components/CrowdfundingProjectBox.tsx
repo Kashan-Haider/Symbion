@@ -45,7 +45,7 @@ const CrowdfundingProjectBox = ({props}:{props:CrowdfundingProject}) => {
       <p>Project ID: {props.projectId}</p>
       <p>Project Wallet: {props.projectWallet}</p>
       <p>Goal Amount: {props.goalAmount}</p>
-      <p>Merchant Depost: {props.merchantDeposit}</p>
+      <p>Merchant Depost: {props.merchantDeposit/1000000000000000000} Eth</p>
       <p>Amount Raised: {props.amountRaised}</p>
       <p>Deadline: {props.deadline}</p>
       <p>Profit Sharing Ratio: {props.profitSharingRatio ? props.profitSharingRatio : 'Not yet decided'}</p>

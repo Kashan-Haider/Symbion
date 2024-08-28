@@ -10,7 +10,7 @@ import Contact from './compnents/contact/Contact'
 
 const App = () => {
   return (
-    <div className='text-white'>
+    <div className='text-white overflow-hidden'>
       <Navbar/>
       <Hero/>
       <Banxa/>
